@@ -58,27 +58,25 @@ class Matrix:
             if element in row:
                 return self.value.index(row), row.index(element)
 
-    def get_row(self, row):
-        return self.value[row]
+    def get(self, num, column = False):
+        if column:
+            return self.transpose()[num]
+        return self.value[num]
 
-    def get_column(self, column):
-        return self.transpose()[column]
-
-    def check_zero_row(self):
+    def get_zeroes(self, column = False):
         row_nums = []
-        for num in range(len(self.value)):
-            for ele in self.value[num]:
-                if ele != 0:
-                    break
-                    pass
-            else:
+        max_index = self.row if column else self.column
+        for num in range(max_index):
+            if self.is_zero(num, column = column):
                 row_nums.append(num)
         return row_nums
 
-    def check_zero_column(self):
-        self_t = Matrix(self.column, self.row, self.transpose())
-        column_nums = self_t.check_zero_row()
-        return column_nums
+    def is_zero(self, num, column = False):
+        element = self.get(num, column = column)
+        for i in element:
+            if i != 0:
+                return False
+        return True
 
     def swap_rows(self, row1, row2):
         result = self.value.copy()
@@ -96,50 +94,60 @@ class Matrix:
         result[row] = [scalar * ele for ele in result[row]]
         return result
 
-    # Probably GEM algorithm next, make the function return a matrix object in REF form
-    def REF(self):
+    def zero_rows_bottom(self):
         result = Matrix(self.row, self.column, self.value.copy())
-        # (Complete)Step 1 - Send all zero rows to bottom
-        zero_rows = self.check_zero_row()
-        row_num = self.row - 1
-        # (edit below line for new row/column convention)
-        # non_zero_rows = [row_num for row_num in range(1, self.row+1) if row_num not in zero_rows]
+        zero_rows = result.get_zeroes()
+        row_num = result.row - 1
         for i in range(len(zero_rows)):
-            if zero_rows[-1-i] == row_num:
+            if zero_rows[-1 - i] == row_num:
                 row_num -= 1
                 continue
-            result.value = result.swap_rows(zero_rows[-1-i], row_num)
+            result.value = result.swap_rows(zero_rows[-1 - i], row_num)
             row_num -= 1
+        return result.value
 
+    def conv_piv_col(self, col_num):
+        result = Matrix(self.row, self.column, self.value.copy())
+
+        # zero_columns = result.get_zeroes(column=True)
+        # (1) Find the row of largest element in that column
+        pivotal_column = result.get(col_num, column=True)
+        pivot = max(pivotal_column)
+        pivotal_row_index, _ = result.find_element(pivot)
+        result.value = result.swap_rows(0, pivotal_row_index)
+        # (2) Reduce all elements below the pivot equal to zero
+        for row_num in range(1,result.row):
+            result.value = result.lin_comb(row_num, 0, (-1) * result.value[row_num][col_num] / pivot)
+
+        return result.value
+
+    def REF(self):
+        result = Matrix(self.row, self.column, self.value.copy())
+        # Step 1 - Send all zero rows to bottom
+        result.value = result.zero_rows_bottom()
+        # zero_columns = result.get_zeroes(column=True)
         # Step 2 - Identify first non-zero column, apply partial pivot(optional) and interchange that row with first row
-        zero_columns = result.check_zero_column()
-        print(zero_columns)
+
+        col = 2
+        result.value = result.conv_piv_col(col)
         # subm_self = submatrix of original
         # (1) Find first nonzero column
-        non_zero_column = 0
-        for i in range(result.column):
-            if i not in zero_columns:
-                non_zero_column = i
-                break
-        else:
-            # Add something if matrix is zero matrix???
-            pass
-        # (2) Find the row of largest element in that column
-        non_zero_columns = result.get_column(non_zero_column)
-        print(non_zero_columns)
-        pivot = max(non_zero_columns)
-        print(pivot)
-        pivot_column = non_zero_column
-        print(pivot_column)
-        pivot_row, _ = result.find_element(pivot)
-        print(pivot_row)
-        result.value = result.swap_rows(0, pivot_row)
+        # non_zero_column = 0
+        # for i in range(result.column):
+        #     if i not in zero_columns:
+        #         non_zero_column = i
+        #         break
+        # else:
+        #     # Add something if matrix is zero matrix???
+        #     pass
 
-        # Step 3 - Make all elements below this pivot equal zero
-        for row_num in range(1,self.row):
-            result.value = result.lin_comb(row_num, 0, (-1) * result.value[row_num][pivot_column]/pivot)
 
         # Step 4 - Repeat steps 2 & 3 for submatrices of result
+        for col_index in range(result.column):
+            if result.is_zero(col_index, column = True):
+                continue
+            result.value = result.conv_piv_col(col_index)
+
 
         return result.value
 
