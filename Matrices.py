@@ -108,8 +108,6 @@ class Matrix:
 
     def conv_piv_col(self, col_num):
         result = Matrix(self.row, self.column, self.value.copy())
-
-        # zero_columns = result.get_zeroes(column=True)
         # (1) Find the row of largest element in that column
         pivotal_column = result.get(col_num, column=True)
         pivot = max(pivotal_column)
@@ -121,33 +119,20 @@ class Matrix:
 
         return result.value
 
-    def REF(self):
+    def get_ref(self):
         result = Matrix(self.row, self.column, self.value.copy())
         # Step 1 - Send all zero rows to bottom
         result.value = result.zero_rows_bottom()
-        # zero_columns = result.get_zeroes(column=True)
-        # Step 2 - Identify first non-zero column, apply partial pivot(optional) and interchange that row with first row
-
-        col = 2
-        result.value = result.conv_piv_col(col)
-        # subm_self = submatrix of original
-        # (1) Find first nonzero column
-        # non_zero_column = 0
-        # for i in range(result.column):
-        #     if i not in zero_columns:
-        #         non_zero_column = i
-        #         break
-        # else:
-        #     # Add something if matrix is zero matrix???
-        #     pass
-
-
-        # Step 4 - Repeat steps 2 & 3 for submatrices of result
+        # Step 2 - Yet to write
+        row_index = 0
         for col_index in range(result.column):
             if result.is_zero(col_index, column = True):
                 continue
-            result.value = result.conv_piv_col(col_index)
-
+            subm_result = Matrix(result.row - row_index, result.column, result.value[row_index:])
+            result.value[row_index:] = subm_result.conv_piv_col(col_index)
+            subm_result.show()
+            result.show()
+            row_index +=1
 
         return result.value
 
@@ -155,9 +140,12 @@ class Matrix:
 
 
 if __name__ == "__main__":
-    a = Matrix(4,3, [[0.0,8.0,0.0], [0.0,0.0,7.0], [0.0,7.0,6.0], [0.0,5.0,0.0]])
+    a = Matrix(4,3, [[0.0,8.0,0.0],
+                                [0.0,0.0,7.0],
+                                [0.0,7.0,6.0],
+                                [0.0,5.0,0.0]])
     # a.value = a.set_matrix()
-    b = Matrix(4, 3, a.REF())
+    b = Matrix(4, 3, a.get_ref())
     b.show()
     # print(b)
 
