@@ -130,8 +130,6 @@ class Matrix:
                 continue
             subm_result = Matrix(result.row - row_index, result.column, result.value[row_index:])
             result.value[row_index:] = subm_result.conv_piv_col(col_index)
-            subm_result.show()
-            result.show()
             row_index +=1
 
         return result.value
@@ -140,14 +138,15 @@ class Matrix:
 
 
 if __name__ == "__main__":
-    a = Matrix(4,3, [[0.0,8.0,0.0],
-                                [0.0,0.0,7.0],
-                                [0.0,7.0,6.0],
-                                [0.0,5.0,0.0]])
-    # a.value = a.set_matrix()
-    b = Matrix(4, 3, a.get_ref())
+    print("This program right now will print the Row Echelon Form of your matrix")
+    row = int(input("Enter number of rows of your matrix: "))
+    column = int(input("Enter number of columns of your matrix: "))
+    print()
+    a = Matrix(row,column)
+    a.value = a.set_matrix()
+    b = Matrix(row, column, a.get_ref())
     b.show()
-    # print(b)
+
 
 
 
