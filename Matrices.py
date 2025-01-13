@@ -65,7 +65,7 @@ class Matrix:
 
     def get_zeroes(self, column = False):
         row_nums = []
-        max_index = self.row if column else self.column
+        max_index = self.row if not column else self.column
         for num in range(max_index):
             if self.is_zero(num, column = column):
                 row_nums.append(num)
@@ -144,6 +144,7 @@ if __name__ == "__main__":
     print()
     a = Matrix(row,column)
     a.value = a.set_matrix()
+    a.show()
     b = Matrix(row, column, a.get_ref())
     b.show()
 
