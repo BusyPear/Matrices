@@ -1,6 +1,5 @@
 class Matrix:
     def __init__(self, r, c, value = None):
-        # self.value = None
         self.row = r
         self.column = c
         if value is None:
@@ -8,12 +7,14 @@ class Matrix:
         else:
             self.value = value
 
+    # Returns nested list with no elements inside
     def empty_matrix(self):
         result = []
         for i in range(self.row):
             result.append([])
         return result
 
+    # Returns a list similar to self but with all elements zero
     def zero_matrix(self):
         result = []
         for i in range(self.row):
@@ -21,6 +22,7 @@ class Matrix:
             result.append(row)
         return result
 
+    # Returns a list with the values given by user
     def set_matrix(self):
         print(f"The matrix requested is a {self.row}x{self.column} matrix. ")
         print("Write each row in a new line and each element in a row separated by one space. ")
@@ -115,7 +117,10 @@ class Matrix:
         result.value = result.swap_rows(0, pivotal_row_index)
         # (2) Reduce all elements below the pivot equal to zero
         for row_num in range(1,result.row):
-            result.value = result.lin_comb(row_num, 0, (-1) * result.value[row_num][col_num] / pivot)
+            try:
+                result.value = result.lin_comb(row_num, 0, (-1) * result.value[row_num][col_num] / pivot)
+            except ZeroDivisionError:
+                pass
 
         return result.value
 
